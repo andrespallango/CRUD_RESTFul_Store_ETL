@@ -8,6 +8,7 @@ namespace BDD
         {
         }
 
+        //Agregar las clases
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Cerveza> Cervezas { get; set; }
         public DbSet<Jugo> Jugos { get; set; }
