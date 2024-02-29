@@ -9,17 +9,17 @@ namespace BDD
         }
 
         //Agregar las clases para el proyecto aquí
+        public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
-        public DbSet<Cerveza> Cervezas { get; set; }
-        public DbSet<Jugo> Jugos { get; set; }
-        public DbSet<Vino> Vinos { get; set; }
+        public DbSet<Producto> Productos { get; set; }
+        public DbSet<Venta> Ventas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Categoria>().ToTable("Categoria");
-            modelBuilder.Entity<Cerveza>().ToTable("Cerveza");
-            modelBuilder.Entity<Vino>().ToTable("Vino");
-            modelBuilder.Entity<Jugo>().ToTable("Jugo");
+            modelBuilder.Entity<Cliente>().ToTable("Clientes");
+            modelBuilder.Entity<Categoria>().ToTable("Categorias");
+            modelBuilder.Entity<Producto>().ToTable("Productos");
+            modelBuilder.Entity<Venta>().ToTable("Ventas");
         }
     }
 }
