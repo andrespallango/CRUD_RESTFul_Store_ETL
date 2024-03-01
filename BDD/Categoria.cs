@@ -9,27 +9,25 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CategoriaId { get; set; }
-
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
+        public string? Descripcion { get; set; }
         
     }
 
 
-    public class CelularCategoria : Categoria
+    public class Celular : Categoria
     {
-        // Propiedad específica de CelularCategoria
         public string Marca { get; set; }
     }
 
 
-    public class ComputadoraCategoria : Categoria
+    public class Computadora : Categoria
     {
-
         public string Procesador { get; set; }
     }
 
 
-    public class LineaBlancaCategoria : Categoria
+    public class LineaBlanca : Categoria
     {
 
         public string TipoElectrodomestico { get; set; }
