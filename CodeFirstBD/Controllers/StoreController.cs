@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CodeFirst.Controllers
+namespace TuProyecto.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -17,22 +17,52 @@ namespace CodeFirst.Controllers
             _context = context;
         }
 
-        [HttpGet("ventas/{clienteId}")]
-        public async Task<IActionResult> ObtenerVentasCliente(int clienteId)
+        // GET: api/Store/ventas/{ventaId}
+        [HttpGet("ventas/{ventaId}")]
+        public async Task<IActionResult> ObtenerVenta(int ventaId)
         {
-            var cliente = await _context.Clientes.FindAsync(clienteId);
+            var venta = await _context.Ventas
+                .Where(v => v.VentaId == ventaId)
+                .Join(
+                    _context.Clientes,
+                    v => v.ClienteId,
+                    c => c.ClienteId,
+                    (venta, cliente) => new
+                    {
+                        venta.VentaId,
+                        venta.FechaVenta,
+                        venta.MontoTotal,
+                        ClienteId = cliente.ClienteId,
+                        ClienteNombre = cliente.Nombre,
+                        ClienteDireccion = cliente.Direccion,
+                        ClienteEdad = cliente.Edad
+                        // Agrega más propiedades del cliente según sea necesario
+                    }
+                )
+                .FirstOrDefaultAsync();
 
-            if (cliente == null)
+            if (venta == null)
             {
-                return NotFound($"Cliente con ID {clienteId} no encontrado.");
+                return NotFound($"Venta con ID {ventaId} no encontrada.");
             }
 
-            var ventas = await _context.Ventas
-                .Include(v => v.Productos)
-                .Where(v => v.ClienteId == clienteId)
-                .ToListAsync();
+            return Ok(venta);
+        }
 
-            return Ok(ventas);
+        // DELETE: api/Store/ventas/{ventaId}
+        [HttpDelete("ventas/{ventaId}")]
+        public async Task<IActionResult> EliminarVenta(int ventaId)
+        {
+            var venta = await _context.Ventas.FindAsync(ventaId);
+            if (venta == null)
+            {
+                return NotFound($"Venta con ID {ventaId} no encontrada.");
+            }
+
+            _context.Ventas.Remove(venta);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
