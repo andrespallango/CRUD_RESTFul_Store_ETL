@@ -13,8 +13,6 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BarConeccion"), b => b.MigrationsAssembly("CodeFirstBD"));
 });
 
-// Register IBebidaService with its implementation BebidaService
-builder.Services.AddScoped<IBebidaService, BebidaService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
