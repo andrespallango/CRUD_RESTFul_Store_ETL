@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CodeFirstBD.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20240301010631_initDB")]
-    partial class initDB
+    [Migration("20240301142624_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -83,14 +83,9 @@ namespace CodeFirstBD.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VentaId")
-                        .HasColumnType("int");
-
                     b.HasKey("ProductoId");
 
                     b.HasIndex("CategoriaId");
-
-                    b.HasIndex("VentaId");
 
                     b.ToTable("Productos", (string)null);
                 });
@@ -112,9 +107,14 @@ namespace CodeFirstBD.Migrations
                     b.Property<double>("MontoTotal")
                         .HasColumnType("float");
 
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
                     b.HasKey("VentaId");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("ProductoId");
 
                     b.ToTable("Ventas", (string)null);
                 });
@@ -127,10 +127,6 @@ namespace CodeFirstBD.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BDD.Venta", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("VentaId");
-
                     b.Navigation("Categoria");
                 });
 
@@ -142,12 +138,15 @@ namespace CodeFirstBD.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cliente");
-                });
+                    b.HasOne("BDD.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("BDD.Venta", b =>
-                {
-                    b.Navigation("Productos");
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Producto");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,18 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BDD
 {
-    public interface IProducto
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        int ProductoId { get; set; }
-
-        string Nombre { get; set; }
-        double Precio { get; set; }
-        int Stock { get; set; }
-    }
-
-    public class Producto : IProducto
+    public class Producto 
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -27,5 +16,6 @@ namespace BDD
         public int CategoriaId { get; set; }
         [ForeignKey("CategoriaId")]
         public Categoria Categoria { get; set; }
+
     }
 }

@@ -10,15 +10,18 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VentaId { get; set; }
+        public DateTime FechaVenta { get; set; } = DateTime.Now;
+        public double MontoTotal { get; set; }
 
         public int ClienteId { get; set; }
         [ForeignKey("ClienteId")]
-        public Cliente? Cliente { get; set; }
+        public virtual Cliente Cliente { get; set; }
+        public int ProductoId { get; set; }
+        [ForeignKey("ProductoId")]
 
-        public List<Producto> Productos { get; set; } = new List<Producto>();
+        
+        public virtual Producto Producto { get; set; }
 
-        public DateTime FechaVenta { get; set; } = DateTime.Now; 
 
-        public double MontoTotal { get; set; } 
     }
 }

@@ -21,4 +21,8 @@
     <ProjectReference Include="..\BDD\BDD.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
