@@ -8,11 +8,9 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductoId { get; set; }
-
         public string Nombre { get; set; }
         public double Precio { get; set; }
         public int Stock { get; set; }
-
         public int CategoriaId { get; set; }
         [ForeignKey("CategoriaId")]
         public Categoria Categoria { get; set; }

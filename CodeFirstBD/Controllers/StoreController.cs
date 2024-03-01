@@ -16,35 +16,74 @@ namespace TuProyecto.Controllers
             _context = context;
         }
 
-        // GET: api/Store/ventas/{ventaId}
-        [HttpGet("ventas/{ventaId}")]
-        public IActionResult ObtenerVenta(int ventaId)
+        // GET: api/Store/ventas/cliente/{clienteId}
+        [HttpGet("ventas/cliente/{clienteId}")]
+        public IActionResult ObtenerVentasCliente(int clienteId)
         {
-            var venta = _context.Ventas
-                .Where(v => v.VentaId == ventaId)
+            var ventas = _context.Ventas
+                .Where(v => v.ClienteId == clienteId)
                 .Join(
                     _context.Clientes,
                     v => v.ClienteId,
                     c => c.ClienteId,
-                    (venta, cliente) => new
+                    (v, c) => new
                     {
-                        venta.VentaId,
-                        venta.FechaVenta,
-                        venta.MontoTotal,
-                        ClienteId = cliente.ClienteId,
-                        ClienteNombre = cliente.Nombre,
-                        ClienteDireccion = cliente.Direccion,
-                        ClienteEdad = cliente.Edad
+                        v.VentaId,
+                        v.FechaVenta,
+                        v.MontoTotal,
+                        ClienteId = c.ClienteId,
+                        ClienteNombre = c.Nombre,
+                        ClienteDireccion = c.Direccion,
+                        ClienteEdad = c.Edad,
+                        ProductoId = v.ProductoId
                     }
                 )
-                .FirstOrDefault();
+                .Join(
+                    _context.Productos,
+                    vc => vc.ProductoId,
+                    p => p.ProductoId,
+                    (vc, p) => new
+                    {
+                        vc.VentaId,
+                        vc.FechaVenta,
+                        vc.MontoTotal,
+                        vc.ClienteId,
+                        vc.ClienteNombre,
+                        vc.ClienteDireccion,
+                        vc.ClienteEdad,
+                        ProductoId = p.ProductoId,
+                        ProductoNombre = p.Nombre,
+                        ProductoPrecio = p.Precio,
+                        ProductoStock = p.Stock,
+                        CategoriaId = p.CategoriaId
+                    }
+                )
+                .Join(
+                    _context.Categorias,
+                    pc => pc.CategoriaId,
+                    cat => cat.CategoriaId,
+                    (pc, cat) => new
+                    {
+                        pc.VentaId,
+                        pc.FechaVenta,
+                        pc.MontoTotal,
+                        pc.ClienteNombre,
+                        pc.ClienteDireccion,
+                        pc.ClienteEdad, 
+                        pc.ProductoNombre,
+                        pc.ProductoPrecio,
+          
+                        CategoriaNombre = cat.Nombre
+                    }
+                )
+                .ToList();
 
-            if (venta == null)
+            if (ventas.Count == 0)
             {
-                return NotFound($"Venta con ID {ventaId} no encontrada.");
+                return NotFound($"No se encontraron ventas para el cliente con ID {clienteId}.");
             }
 
-            return Ok(venta);
+            return Ok(ventas);
         }
 
         // DELETE: api/Store/ventas/{ventaId}
