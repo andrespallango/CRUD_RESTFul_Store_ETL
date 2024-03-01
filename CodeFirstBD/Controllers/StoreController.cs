@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace TuProyecto.Controllers
 {
@@ -19,9 +18,9 @@ namespace TuProyecto.Controllers
 
         // GET: api/Store/ventas/{ventaId}
         [HttpGet("ventas/{ventaId}")]
-        public async Task<IActionResult> ObtenerVenta(int ventaId)
+        public IActionResult ObtenerVenta(int ventaId)
         {
-            var venta = await _context.Ventas
+            var venta = _context.Ventas
                 .Where(v => v.VentaId == ventaId)
                 .Join(
                     _context.Clientes,
@@ -36,10 +35,9 @@ namespace TuProyecto.Controllers
                         ClienteNombre = cliente.Nombre,
                         ClienteDireccion = cliente.Direccion,
                         ClienteEdad = cliente.Edad
-                        // Agrega más propiedades del cliente según sea necesario
                     }
                 )
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (venta == null)
             {
@@ -51,16 +49,16 @@ namespace TuProyecto.Controllers
 
         // DELETE: api/Store/ventas/{ventaId}
         [HttpDelete("ventas/{ventaId}")]
-        public async Task<IActionResult> EliminarVenta(int ventaId)
+        public IActionResult EliminarVenta(int ventaId)
         {
-            var venta = await _context.Ventas.FindAsync(ventaId);
+            var venta = _context.Ventas.Find(ventaId);
             if (venta == null)
             {
                 return NotFound($"Venta con ID {ventaId} no encontrada.");
             }
 
             _context.Ventas.Remove(venta);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return NoContent();
         }
