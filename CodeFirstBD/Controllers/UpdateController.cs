@@ -15,7 +15,6 @@ namespace CodeFirstBD.Controllers
             _context = context;
         }
 
-        // PUT: api/Update/ventas/{id}
         [HttpPut("ventas/{id}")]
         public IActionResult ActualizarVenta(
             int id,

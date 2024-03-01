@@ -18,7 +18,7 @@ namespace CodeFirstBD.Controllers
 
         // POST: api/Insert/ventas
         [HttpPost("ventas")]
-        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto)
+        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, DateTime fechaVenta)
         {
             try
             {
@@ -37,24 +37,33 @@ namespace CodeFirstBD.Controllers
                     return NotFound("Producto o cliente no encontrado.");
                 }
 
+                // Verificar si hay suficiente stock
+                if (producto.Stock < cantidadProducto)
+                {
+                    return BadRequest("Stock insuficiente para completar la venta.");
+                }
+
                 // Calcular el MontoTotal multiplicando el precio del producto por la cantidad
                 double montoTotal = producto.Precio * cantidadProducto;
 
                 // Crear una nueva instancia de Venta con los datos obtenidos
                 var nuevaVenta = new Venta
                 {
-                    FechaVenta = DateTime.Now,
+                    FechaVenta = fechaVenta,
                     MontoTotal = montoTotal,
                     CantidadProducto = cantidadProducto,
                     Cliente = cliente,
                     Producto = producto
                 };
 
+                // Actualizar el stock del producto
+                producto.Stock -= cantidadProducto;
+
                 // Agregar la nueva venta al contexto y guardar cambios
                 _context.Ventas.Add(nuevaVenta);
                 _context.SaveChanges();
 
-                return Ok($"Venta registrada con ID {nuevaVenta.VentaId}.");
+                return Ok($"Venta registrada con ID {nuevaVenta.VentaId}. Stock actualizado: {producto.Stock}");
             }
             catch (Exception ex)
             {
