@@ -8,7 +8,6 @@ namespace BDD
         {
         }
 
-        //Agregar las clases para el proyecto aquí
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Producto> Productos { get; set; }

@@ -24,7 +24,6 @@ namespace BDD
         public double Precio { get; set; }
         public int Stock { get; set; }
 
-        // Llave foránea a la categoría
         public int CategoriaId { get; set; }
         [ForeignKey("CategoriaId")]
         public Categoria Categoria { get; set; }

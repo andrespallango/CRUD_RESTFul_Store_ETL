@@ -8,8 +8,9 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ClienteId { get; set; }
+        public string? Nombre { get; set; }
+        public string? Direccion { get; set; }
+        public int Edad { get; set; }
 
-        public string Nombre { get; set; }
-        // Otras propiedades del cliente
     }
 }
