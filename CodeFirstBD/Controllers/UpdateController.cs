@@ -34,6 +34,11 @@ namespace CodeFirstBD.Controllers
                 {
                     return NotFound($"Venta con ID {id} no encontrada.");
                 }
+                // Validar cantidadProducto para asegurar que sea un número entero positivo
+                if (cantidadProducto <= 0)
+                {
+                    return BadRequest("La cantidad de producto debe ser un número entero positivo.");
+                }
 
                 // Buscar el cliente por cédula
                 var cliente = BuscarClientePorCedula(cedulaCliente);
@@ -47,6 +52,31 @@ namespace CodeFirstBD.Controllers
                     return NotFound("Producto o cliente no encontrado.");
                 }
 
+                // Obtener la cantidad actual de la venta
+                int cantidadActual = venta.CantidadProducto;
+
+                // Si la cantidad ingresada es mayor a la actual, restar del stock
+                if (cantidadProducto > cantidadActual)
+                {
+                    int cantidadRestar = cantidadProducto - cantidadActual;
+
+                    // Validar que la cantidad a restar no sea mayor que el stock disponible
+                    if (cantidadRestar > producto.Stock)
+                    {
+                        return BadRequest("La cantidad de producto especificada es mayor que el stock disponible.");
+                    }
+
+                    // Actualizar el stock del producto
+                    producto.Stock -= cantidadRestar;
+                }
+                // Si la cantidad ingresada es menor a la actual, aumentar el stock
+                else if (cantidadProducto < cantidadActual)
+                {
+                    int cantidadAumentar = cantidadActual - cantidadProducto;
+
+                    // Aumentar el stock del producto
+                    producto.Stock += cantidadAumentar;
+                }
                 // Calcular el MontoTotal multiplicando el precio del producto por la cantidad
                 double montoTotal = producto.Precio * cantidadProducto;
 
@@ -72,6 +102,40 @@ namespace CodeFirstBD.Controllers
             {
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
+        }
+        private bool ValidarCedulaEcuatoriana(string cedula)
+        {
+            if (cedula.Length == 10)
+            {
+                var digitoRegion = cedula.Substring(0, 2);
+
+                if (int.TryParse(digitoRegion, out int region) && region >= 1 && region <= 24)
+                {
+                    var ultimoDigito = int.Parse(cedula.Substring(9, 1));
+
+                    var pares = int.Parse(cedula.Substring(1, 1)) + int.Parse(cedula.Substring(3, 1)) +
+                                int.Parse(cedula.Substring(5, 1)) + int.Parse(cedula.Substring(7, 1));
+
+                    var impares = 0;
+                    for (var i = 0; i < 9; i += 2)
+                    {
+                        var numero = int.Parse(cedula.Substring(i, 1)) * 2;
+                        impares += (numero > 9) ? (numero - 9) : numero;
+                    }
+
+                    var sumaTotal = pares + impares;
+                    var primerDigitoSuma = int.Parse(sumaTotal.ToString().Substring(0, 1));
+                    var decena = (primerDigitoSuma + 1) * 10;
+                    var digitoValidador = decena - sumaTotal;
+
+                    if (digitoValidador == 10)
+                        digitoValidador = 0;
+
+                    return digitoValidador == ultimoDigito;
+                }
+            }
+
+            return false;
         }
 
         private Cliente BuscarClientePorCedula(string cedula)
