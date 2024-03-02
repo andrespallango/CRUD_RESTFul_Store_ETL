@@ -16,19 +16,28 @@ namespace CodeFirstBD.Controllers
             _context = context;
         }
 
-        // POST: api/Insert/ventas
         [HttpPost("ventas")]
         public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, DateTime fechaVenta)
         {
             try
             {
-                // Validar cédula
+                // Validar cantidadProducto para asegurar que sea un número entero positivo
+                if (cantidadProducto <= 0)
+                {
+                    return BadRequest("La cantidad de producto debe ser un número entero positivo.");
+                }
+
+                // Validar que la fecha de la venta sea desde el año 2020 en adelante y no sea futura
+                if (fechaVenta.Year < 2020 || fechaVenta > DateTime.Now)
+                {
+                    return BadRequest("La fecha de la venta debe ser a partir del año 2020 y no puede ser una fecha futura.");
+                }
+
                 if (!ValidarCedulaEcuatoriana(cedulaCliente))
                 {
                     return BadRequest("Cédula incorrecta.");
                 }
 
-                // Obtener el cliente y producto de la base de datos por cédula y nombre
                 var cliente = _context.Clientes.FirstOrDefault(c => c.Cedula == cedulaCliente);
                 var producto = _context.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
 
@@ -37,16 +46,13 @@ namespace CodeFirstBD.Controllers
                     return NotFound("Producto o cliente no encontrado.");
                 }
 
-                // Verificar si hay suficiente stock
                 if (producto.Stock < cantidadProducto)
                 {
                     return BadRequest("Stock insuficiente para completar la venta.");
                 }
 
-                // Calcular el MontoTotal multiplicando el precio del producto por la cantidad
                 double montoTotal = producto.Precio * cantidadProducto;
 
-                // Crear una nueva instancia de Venta con los datos obtenidos
                 var nuevaVenta = new Venta
                 {
                     FechaVenta = fechaVenta,
@@ -56,10 +62,8 @@ namespace CodeFirstBD.Controllers
                     Producto = producto
                 };
 
-                // Actualizar el stock del producto
                 producto.Stock -= cantidadProducto;
 
-                // Agregar la nueva venta al contexto y guardar cambios
                 _context.Ventas.Add(nuevaVenta);
                 _context.SaveChanges();
 
@@ -70,8 +74,6 @@ namespace CodeFirstBD.Controllers
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
-
-        // Función para validar cédula ecuatoriana
         private bool ValidarCedulaEcuatoriana(string cedula)
         {
             if (cedula.Length == 10)
