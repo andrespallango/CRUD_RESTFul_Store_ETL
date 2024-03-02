@@ -22,7 +22,8 @@ namespace CodeFirstBD.Controllers
             int id,
             string cedulaCliente,
             string nombreProducto,
-            int cantidadProducto)
+            int cantidadProducto,
+            DateTime nuevaFechaVenta)
         {
             try
             {
@@ -49,8 +50,14 @@ namespace CodeFirstBD.Controllers
                 // Calcular el MontoTotal multiplicando el precio del producto por la cantidad
                 double montoTotal = producto.Precio * cantidadProducto;
 
+                // Validar la nueva fecha
+                if (nuevaFechaVenta.Year < 2000 || nuevaFechaVenta > DateTime.Now)
+                {
+                    return BadRequest("La fecha de venta debe estar entre el año 2000 y la fecha actual.");
+                }
+
                 // Actualizar los campos de la venta
-                venta.FechaVenta = DateTime.Now;
+                venta.FechaVenta = nuevaFechaVenta;
                 venta.MontoTotal = montoTotal;
                 venta.CantidadProducto = cantidadProducto;
                 venta.Cliente = cliente;
