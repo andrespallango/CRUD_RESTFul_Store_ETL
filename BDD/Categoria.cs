@@ -23,3 +23,4 @@ namespace BDD
         public string? TipoElectrodomestico { get; set; }
     }
 }
+

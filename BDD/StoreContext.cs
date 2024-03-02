@@ -2,11 +2,9 @@
 
 namespace BDD
 {
-    public class StoreContext : DbContext
-    {
+    public class StoreContext : DbContext{
         public StoreContext(DbContextOptions<StoreContext> options) : base(options)
-        {
-        }
+        {}
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Venta> Ventas { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
@@ -14,9 +12,7 @@ namespace BDD
         public DbSet<Celular> Celulares { get; set; }
         public DbSet<Computadora> Computadoras { get; set; }
         public DbSet<LineaBlanca> LineasBlancas { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        protected override void OnModelCreating(ModelBuilder modelBuilder){
             modelBuilder.Entity<Cliente>().ToTable("Clientes");
             modelBuilder.Entity<Categoria>().ToTable("Categorias");
             modelBuilder.Entity<Producto>().ToTable("Productos");

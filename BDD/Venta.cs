@@ -18,10 +18,9 @@ namespace BDD
         public virtual Cliente Cliente { get; set; }
         public int ProductoId { get; set; }
         [ForeignKey("ProductoId")]
-
-        
         public virtual Producto Producto { get; set; }
 
 
     }
 }
+
