@@ -1,6 +1,8 @@
 ﻿using BDD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace CodeFirstBD.Controllers
 {
@@ -33,26 +35,10 @@ namespace CodeFirstBD.Controllers
                 }
 
                 // Buscar el cliente por cédula
-                Cliente cliente = null;
-                foreach (var c in _context.Clientes)
-                {
-                    if (c.Cedula == cedulaCliente)
-                    {
-                        cliente = c;
-                        break;
-                    }
-                }
+                var cliente = BuscarClientePorCedula(cedulaCliente);
 
-                // Buscar el producto por nombre
-                Producto producto = null;
-                foreach (var p in _context.Productos)
-                {
-                    if (p.Nombre == nombreProducto)
-                    {
-                        producto = p;
-                        break;
-                    }
-                }
+                // Buscar el producto por nombre de manera insensible a mayúsculas/minúsculas
+                var producto = BuscarProductoPorNombre(nombreProducto);
 
                 // Verificar si cliente y producto fueron encontrados
                 if (producto == null || cliente == null)
@@ -79,6 +65,30 @@ namespace CodeFirstBD.Controllers
             {
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
+        }
+
+        private Cliente BuscarClientePorCedula(string cedula)
+        {
+            foreach (var cliente in _context.Clientes)
+            {
+                if (cliente.Cedula.Equals(cedula, StringComparison.OrdinalIgnoreCase))
+                {
+                    return cliente;
+                }
+            }
+            return null;
+        }
+
+        private Producto BuscarProductoPorNombre(string nombre)
+        {
+            foreach (var producto in _context.Productos)
+            {
+                if (producto.Nombre.Equals(nombre, StringComparison.OrdinalIgnoreCase))
+                {
+                    return producto;
+                }
+            }
+            return null;
         }
     }
 }
