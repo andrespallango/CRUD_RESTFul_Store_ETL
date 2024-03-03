@@ -41,12 +41,10 @@ namespace CodeFirstBD.Controllers
                         break;
                     }
                 }
-
                 if (producto == null)
                 {
                     return NotFound("Producto no encontrado.");
                 }
-
                 return Ok(producto);
             }
             catch (Exception ex)

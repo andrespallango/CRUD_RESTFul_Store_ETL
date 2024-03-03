@@ -9,7 +9,6 @@ namespace CodeFirstBD.Controllers
     public class ReadCustomerController : ControllerBase
     {
         private readonly StoreContext _context;
-
         public ReadCustomerController(StoreContext context)
         {
             _context = context;
@@ -34,11 +33,9 @@ namespace CodeFirstBD.Controllers
                             Direccion = cliente.Direccion,
                             Edad = cliente.Edad
                         };
-
                         break;
                     }
                 }
-
                 if (clienteEncontrado == null)
                 {
                     return NotFound("Cliente no encontrado.");
