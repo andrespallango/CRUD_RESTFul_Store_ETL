@@ -16,11 +16,9 @@ namespace CodeFirstBD.Controllers
             _context = context;
         }
 
-        // GET: api/Store/ventas/cliente/{cedula}
         [HttpGet("ventas/cliente/{cedula}")]
         public IActionResult ObtenerVentasCliente(string cedula)
         {
-            // Validar cédula
             if (!ValidarCedulaEcuatoriana(cedula))
             {
                 return BadRequest("Cédula incorrecta.");
@@ -29,61 +27,25 @@ namespace CodeFirstBD.Controllers
             var ventas = _context.Ventas
                 .Where(v => v.Cliente.Cedula == cedula)
                 .Join(
-                    _context.Clientes,
-                    v => v.ClienteId,
-                    c => c.ClienteId,
-                    (v, c) => new
-                    {
-                        v.VentaId,
-                        v.FechaVenta,
-                        v.CantidadProducto,
-                        v.MontoTotal,
-                        ClienteId = c.ClienteId,
-                        ClienteCedula = c.Cedula,
-                        ClienteNombre = c.Nombre,
-                        ClienteDireccion = c.Direccion,
-                        ClienteEdad = c.Edad,
-                        ProductoId = v.ProductoId
+                    _context.Clientes, v => v.ClienteId, c => c.ClienteId, (v, c) => new{
+                        v.VentaId, v.FechaVenta, v.CantidadProducto, v.MontoTotal, ClienteId = c.ClienteId,
+                        ClienteCedula = c.Cedula, ClienteNombre = c.Nombre, ClienteDireccion = c.Direccion,
+                        ClienteEdad = c.Edad, ProductoId = v.ProductoId
                     }
                 )
                 .Join(
                     _context.Productos,
-                    vc => vc.ProductoId,
-                    p => p.ProductoId,
-                    (vc, p) => new
-                    {
-                        vc.VentaId,
-                        vc.FechaVenta,
-                        vc.CantidadProducto,
-                        vc.MontoTotal,
-                        vc.ClienteId,
-                        vc.ClienteCedula,
-                        vc.ClienteNombre,
-                        vc.ClienteDireccion,
-                        vc.ClienteEdad,
-                        ProductoId = p.ProductoId,
-                        ProductoNombre = p.Nombre,
-                        ProductoPrecio = p.Precio,
-                        ProductoStock = p.Stock,
-                        CategoriaId = p.CategoriaId
+                    vc => vc.ProductoId,p => p.ProductoId, (vc, p) => new{
+                        vc.VentaId, vc.FechaVenta, vc.CantidadProducto, vc.MontoTotal, vc.ClienteId,
+                        vc.ClienteCedula, vc.ClienteNombre, vc.ClienteDireccion, vc.ClienteEdad,
+                        ProductoId = p.ProductoId, ProductoNombre = p.Nombre, ProductoPrecio = p.Precio,
+                        ProductoStock = p.Stock, CategoriaId = p.CategoriaId
                     }
                 )
                 .Join(
-                    _context.Categorias,
-                    pc => pc.CategoriaId,
-                    cat => cat.CategoriaId,
-                    (pc, cat) => new
-                    {
-                        pc.VentaId,
-                        pc.FechaVenta,
-                        pc.CantidadProducto,
-                        pc.MontoTotal,
-                        pc.ClienteNombre,
-                        pc.ClienteCedula,
-                        pc.ClienteDireccion,
-                        pc.ClienteEdad,
-                        pc.ProductoNombre,
-                        pc.ProductoPrecio,
+                    _context.Categorias, pc => pc.CategoriaId, cat => cat.CategoriaId, (pc, cat) => new{
+                        pc.VentaId, pc.FechaVenta, pc.CantidadProducto, pc.MontoTotal, pc.ClienteNombre,
+                        pc.ClienteCedula, pc.ClienteDireccion, pc.ClienteEdad, pc.ProductoNombre, pc.ProductoPrecio,
                         CategoriaNombre = cat.Nombre
                     }
                 )
@@ -97,7 +59,6 @@ namespace CodeFirstBD.Controllers
             return Ok(ventas);
         }
 
-        // Función para validar cédula ecuatoriana
         private bool ValidarCedulaEcuatoriana(string cedula)
         {
             if (cedula.Length == 10)

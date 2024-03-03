@@ -35,8 +35,6 @@ namespace CodeFirstBD.Controllers
                 {
                     return NotFound("Categoría no encontrada.");
                 }
-
-                // Validar que el precio y el stock no sean negativos
                 if (precio < 0 || stock < 0)
                 {
                     return BadRequest("El precio y el stock no pueden ser números negativos.");
@@ -56,8 +54,7 @@ namespace CodeFirstBD.Controllers
 
                 return Ok($"Producto registrado con ID {nuevoProducto.ProductoId}.");
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex){
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }

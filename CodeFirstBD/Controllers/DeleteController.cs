@@ -10,12 +10,10 @@ namespace TuProyecto.Controllers
     public class DeleteController : ControllerBase
     {
         private readonly StoreContext _context;
-
         public DeleteController(StoreContext context)
         {
             _context = context;
         }
-
         [HttpDelete("ventas/{ventaId}")]
         public IActionResult EliminarVenta(int ventaId)
         {
@@ -24,7 +22,6 @@ namespace TuProyecto.Controllers
             {
                 return NotFound($"Venta con ID {ventaId} no encontrada.");
             }
-
             _context.Ventas.Remove(venta);
             _context.SaveChanges();
 

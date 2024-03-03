@@ -17,7 +17,8 @@ namespace CodeFirstBD.Controllers
         }
 
         [HttpPost("ventas")]
-        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, DateTime fechaVenta)
+        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, 
+            DateTime fechaVenta)
         {
             try
             {
@@ -123,8 +124,8 @@ namespace CodeFirstBD.Controllers
                     return digitoValidador == ultimoDigito;
                 }
             }
-
             return false;
         }
     }
 }
+

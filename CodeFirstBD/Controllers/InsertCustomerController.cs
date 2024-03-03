@@ -10,24 +10,19 @@ namespace CodeFirstBD.Controllers
     public class InsertCustomerController : ControllerBase
     {
         private readonly StoreContext _context;
-
         public InsertCustomerController(StoreContext context)
         {
             _context = context;
         }
-
         [HttpPost("clientes")]
         public IActionResult InsertarCliente(string cedula, string nombre, string direccion, int edad)
         {
             try
             {
-                // Validar la cédula ecuatoriana
                 if (!ValidarCedulaEcuatoriana(cedula))
                 {
                     return BadRequest("Cédula incorrecta.");
                 }
-
-                // Verificar si ya existe un cliente con la misma cédula
                 var clientesConMismaCedula = _context.Clientes
                     .AsEnumerable()
                     .Where(c => string.Equals(c.Cedula, cedula, StringComparison.OrdinalIgnoreCase));
@@ -36,14 +31,10 @@ namespace CodeFirstBD.Controllers
                 {
                     return BadRequest("Ya existe un cliente con la misma cédula.");
                 }
-
-                // Validar que la edad sea mayor de 18 y menor de 114 años
                 if (edad <= 18 || edad >= 114)
                 {
                     return BadRequest("La edad debe ser mayor a 18 y menor a 114 años.");
                 }
-
-                // Crear una nueva instancia de Cliente
                 var nuevoCliente = new Cliente
                 {
                     Cedula = cedula,

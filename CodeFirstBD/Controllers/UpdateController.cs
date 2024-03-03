@@ -27,75 +27,52 @@ namespace CodeFirstBD.Controllers
         {
             try
             {
-                // Obtener la venta por ID
                 var venta = _context.Ventas.Find(id);
 
                 if (venta == null)
                 {
                     return NotFound($"Venta con ID {id} no encontrada.");
                 }
-                // Validar cantidadProducto para asegurar que sea un número entero positivo
                 if (cantidadProducto <= 0)
                 {
                     return BadRequest("La cantidad de producto debe ser un número entero positivo.");
                 }
 
-                // Buscar el cliente por cédula
                 var cliente = BuscarClientePorCedula(cedulaCliente);
-
-                // Buscar el producto por nombre de manera insensible a mayúsculas/minúsculas
                 var producto = BuscarProductoPorNombre(nombreProducto);
 
-                // Verificar si cliente y producto fueron encontrados
                 if (producto == null || cliente == null)
                 {
                     return NotFound("Producto o cliente no encontrado.");
                 }
 
-                // Obtener la cantidad actual de la venta
                 int cantidadActual = venta.CantidadProducto;
 
-                // Si la cantidad ingresada es mayor a la actual, restar del stock
                 if (cantidadProducto > cantidadActual)
                 {
                     int cantidadRestar = cantidadProducto - cantidadActual;
-
-                    // Validar que la cantidad a restar no sea mayor que el stock disponible
                     if (cantidadRestar > producto.Stock)
                     {
                         return BadRequest("La cantidad de producto especificada es mayor que el stock disponible.");
                     }
-
-                    // Actualizar el stock del producto
                     producto.Stock -= cantidadRestar;
                 }
-                // Si la cantidad ingresada es menor a la actual, aumentar el stock
                 else if (cantidadProducto < cantidadActual)
                 {
                     int cantidadAumentar = cantidadActual - cantidadProducto;
-
-                    // Aumentar el stock del producto
                     producto.Stock += cantidadAumentar;
                 }
-                // Calcular el MontoTotal multiplicando el precio del producto por la cantidad
                 double montoTotal = producto.Precio * cantidadProducto;
-
-                // Validar la nueva fecha
                 if (nuevaFechaVenta.Year < 2000 || nuevaFechaVenta > DateTime.Now)
                 {
                     return BadRequest("La fecha de venta debe estar entre el año 2000 y la fecha actual.");
                 }
-
-                // Actualizar los campos de la venta
                 venta.FechaVenta = nuevaFechaVenta;
                 venta.MontoTotal = montoTotal;
                 venta.CantidadProducto = cantidadProducto;
                 venta.Cliente = cliente;
                 venta.Producto = producto;
-
-                // Guardar cambios
                 _context.SaveChanges();
-
                 return Ok($"Venta con ID {id} actualizada.");
             }
             catch (Exception ex)
