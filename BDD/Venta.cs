@@ -10,6 +10,7 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VentaId { get; set; }
+        [Required]
         public DateTime FechaVenta { get; set; } = DateTime.Now;
         public double MontoTotal { get; set; } 
         public int CantidadProducto {  get; set; }

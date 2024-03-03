@@ -8,6 +8,7 @@ namespace BDD
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductoId { get; set; }
+        [Required]
         public string Nombre { get; set; }
         public double Precio { get; set; }
         public int Stock { get; set; }
