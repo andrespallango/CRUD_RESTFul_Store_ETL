@@ -53,7 +53,7 @@ namespace CodeFirstBD.Controllers
                     int cantidadRestar = cantidadProducto - cantidadActual;
                     if (cantidadRestar > producto.Stock)
                     {
-                        return BadRequest("La cantidad de producto especificada es mayor que el stock disponible.");
+                        return BadRequest("La cantidad de producto especificada es mayor que el stock disponible.("+producto.Stock+")");
                     }
                     producto.Stock -= cantidadRestar;
                 }
@@ -63,9 +63,9 @@ namespace CodeFirstBD.Controllers
                     producto.Stock += cantidadAumentar;
                 }
                 double montoTotal = producto.Precio * cantidadProducto;
-                if (nuevaFechaVenta.Year < 2000 || nuevaFechaVenta > DateTime.Now)
+                if (nuevaFechaVenta.Year < 2020 || nuevaFechaVenta > DateTime.Now)
                 {
-                    return BadRequest("La fecha de venta debe estar entre el año 2000 y la fecha actual.");
+                    return BadRequest("La fecha de venta debe estar entre el año 2020 y la fecha actual.");
                 }
                 venta.FechaVenta = nuevaFechaVenta;
                 venta.MontoTotal = montoTotal;
@@ -80,6 +80,43 @@ namespace CodeFirstBD.Controllers
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
+
+        [HttpPut("actualizarStock")]
+        public IActionResult ActualizarStockProducto(string nombreProducto, int nuevoStock)
+        {
+            try
+            {
+                if (nuevoStock < 0)
+                {
+                    return BadRequest("El stock no puede ser un número negativo.");
+                }
+
+                Producto productoEncontrado = null;
+                foreach (var producto in _context.Productos)
+                {
+                    if (string.Equals(producto.Nombre, nombreProducto, StringComparison.OrdinalIgnoreCase))
+                    {
+                        productoEncontrado = producto;
+                        break;
+                    }
+                }
+
+                if (productoEncontrado == null)
+                {
+                    return NotFound("Producto no encontrado.");
+                }
+
+                productoEncontrado.Stock = nuevoStock;
+                _context.SaveChanges();
+
+                return Ok($"Stock del producto '{nombreProducto}' actualizado a {nuevoStock}.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
         private bool ValidarCedulaEcuatoriana(string cedula)
         {
             if (cedula.Length == 10)

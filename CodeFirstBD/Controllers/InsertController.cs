@@ -17,11 +17,11 @@ namespace CodeFirstBD.Controllers
         }
 
         [HttpPost("ventas")]
-        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, 
-            DateTime fechaVenta)
+        public IActionResult InsertarVenta(string cedulaCliente, string nombreProducto, int cantidadProducto, DateTime fechaVenta)
         {
             try
             {
+
                 if (cantidadProducto <= 0)
                 {
                     return BadRequest("La cantidad de producto debe ser un número entero positivo.");
@@ -29,7 +29,7 @@ namespace CodeFirstBD.Controllers
 
                 if (fechaVenta.Year < 2020 || fechaVenta > DateTime.Now)
                 {
-                    return BadRequest("La fecha de la venta debe ser a partir del año 2020 y no puede ser una fecha futura.");
+                    return BadRequest("La fecha de venta debe estar entre el año 2020 y la fecha actual.");
                 }
 
                 if (!ValidarCedulaEcuatoriana(cedulaCliente))
@@ -69,7 +69,7 @@ namespace CodeFirstBD.Controllers
 
                 if (producto.Stock < cantidadProducto)
                 {
-                    return BadRequest("Stock insuficiente para completar la venta.");
+                    return BadRequest($"La cantidad de producto especificada es mayor que el stock disponible ({producto.Stock}).");
                 }
 
                 double montoTotal = producto.Precio * cantidadProducto;
@@ -89,6 +89,89 @@ namespace CodeFirstBD.Controllers
                 _context.SaveChanges();
 
                 return Ok($"Venta registrada con ID {nuevaVenta.VentaId}. Stock actualizado: {producto.Stock}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+        [HttpPost("productos")]
+        public IActionResult InsertarProducto(string nombre, double precio, int stock, int categoriaId)
+        {
+            try
+            {
+                var productosConMismoNombre = _context.Productos.AsEnumerable()
+                    .Where(p => string.Equals(p.Nombre, nombre, StringComparison.OrdinalIgnoreCase));
+
+                if (productosConMismoNombre.Any())
+                {
+                    return BadRequest("Ya existe un producto con el mismo nombre.");
+                }
+
+                var categoria = BuscarCategoriaPorId(categoriaId);
+
+                if (categoria == null)
+                {
+                    return NotFound("Categoría no encontrada.");
+                }
+                if (precio < 0 || stock < 0)
+                {
+                    return BadRequest("El precio y el stock no pueden ser números negativos.");
+                }
+
+                var nuevoProducto = new Producto
+                {
+                    Nombre = nombre,
+                    Precio = precio,
+                    Stock = stock,
+                    CategoriaId = categoriaId,
+                    Categoria = categoria
+                };
+
+                _context.Productos.Add(nuevoProducto);
+                _context.SaveChanges();
+
+                return Ok($"Producto registrado con ID {nuevoProducto.ProductoId}.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+        [HttpPost("clientes")]
+        public IActionResult InsertarCliente(string cedula, string nombre, string direccion, int edad)
+        {
+            try
+            {
+                if (!ValidarCedulaEcuatoriana(cedula))
+                {
+                    return BadRequest("Cédula incorrecta.");
+                }
+                var clientesConMismaCedula = _context.Clientes
+                    .AsEnumerable()
+                    .Where(c => string.Equals(c.Cedula, cedula, StringComparison.OrdinalIgnoreCase));
+
+                if (clientesConMismaCedula.Any())
+                {
+                    return BadRequest("Ya existe un cliente con la misma cédula.");
+                }
+                if (edad <= 18 || edad >= 114)
+                {
+                    return BadRequest("La edad debe ser mayor a 18 y menor a 114 años.");
+                }
+                var nuevoCliente = new Cliente
+                {
+                    Cedula = cedula,
+                    Nombre = nombre,
+                    Direccion = direccion,
+                    Edad = edad
+                };
+
+                _context.Clientes.Add(nuevoCliente);
+                _context.SaveChanges();
+
+                return Ok($"Cliente registrado con ID {nuevoCliente.ClienteId}.");
             }
             catch (Exception ex)
             {
@@ -124,8 +207,20 @@ namespace CodeFirstBD.Controllers
                     return digitoValidador == ultimoDigito;
                 }
             }
+
             return false;
+        }
+
+        private Categoria BuscarCategoriaPorId(int categoriaId)
+        {
+            foreach (var categoria in _context.Categorias.AsEnumerable())
+            {
+                if (categoria.CategoriaId == categoriaId)
+                {
+                    return categoria;
+                }
+            }
+            return null;
         }
     }
 }
-
